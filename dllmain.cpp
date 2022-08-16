@@ -92,7 +92,7 @@ void main_thread( HMODULE dll_module )
     constexpr auto arg_tuple = std::make_tuple< const char* >( { "exprssn" } );
 	const auto tuple = alloc_tuple( arg_tuple );
 
-    const auto caller_func_address = alloc_func( reinterpret_cast< void* >( call_ext_func< void, calling_conventions::cdecl_, std::string_view > ) );
+    const auto caller_func_address = alloc_func( &call_ext_func< void, calling_conventions::cdecl_, std::string_view > );
 	const auto caller = static_cast< cextf_proto >( caller_func_address );
 
     caller( base + function_rva, reinterpret_cast< std::uint32_t >( tuple ) );
