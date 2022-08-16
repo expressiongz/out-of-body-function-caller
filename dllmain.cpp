@@ -35,7 +35,7 @@ void __stdcall call_ext_func( std::uint32_t function_address, std::uint32_t tupl
 			      const auto cdecl_proc_func = reinterpret_cast< cdecl_proc_func_proto >( function_address );
 			      std::apply( cdecl_proc_func, function_args_tuples );
 			      break;
-			}
+		    }
 		    case calling_conventions::fastcall_:
 		    {
 			      typedef func_ret_t( __fastcall* fastcall_proc_func_proto )( function_args... );
@@ -63,9 +63,8 @@ void* alloc_func(void* func_address)
 {
     const auto function_instructions = ret_function_instrs( func_address );
     const auto allocated_function = VirtualAlloc( nullptr, function_instructions.size( ), MEM_COMMIT, PAGE_EXECUTE_READWRITE );
-
-	if( !allocated_function )
-		throw std::runtime_error( "failed to allocate memory for function." );
+    if( !allocated_function )
+	throw std::runtime_error( "failed to allocate memory for function." );
 
     std::memcpy( allocated_function, function_instructions.data( ), function_instructions.size( ) );
     return allocated_function;
@@ -89,13 +88,13 @@ void main_thread( HMODULE dll_module )
 	const auto base = reinterpret_cast< std::uint32_t >( GetModuleHandleA( nullptr ) );
 	constexpr auto function_rva = 0x1000;
 
-    constexpr auto arg_tuple = std::make_tuple< const char* >( { "exprssn" } );
+    	constexpr auto arg_tuple = std::make_tuple< const char* >( { "exprssn" } );
 	const auto tuple = alloc_tuple( arg_tuple );
 
-    const auto caller_func_address = alloc_func( &call_ext_func< void, calling_conventions::cdecl_, std::string_view > );
+    	const auto caller_func_address = alloc_func( &call_ext_func< void, calling_conventions::cdecl_, const char* > );
 	const auto caller = static_cast< cextf_proto >( caller_func_address );
 
-    caller( base + function_rva, reinterpret_cast< std::uint32_t >( tuple ) );
+    	caller( base + function_rva, reinterpret_cast< std::uint32_t >( tuple ) );
 	FreeLibrary( dll_module );
 }
 
